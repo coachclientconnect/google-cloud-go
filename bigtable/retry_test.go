@@ -23,7 +23,6 @@ import (
 
 	"cloud.google.com/go/bigtable/bttest"
 	"cloud.google.com/go/internal/testutil"
-	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/google/go-cmp/cmp"
 	"google.golang.org/api/option"
 	btpb "google.golang.org/genproto/googleapis/bigtable/v2"
@@ -31,6 +30,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func setupFakeServer(opt ...grpc.ServerOption) (tbl *Table, cleanup func(), err error) {
@@ -413,6 +413,15 @@ func TestRetryReadRows(t *testing.T) {
 		case 3:
 			// Write two more rows
 			must(writeReadRowsResponse(ss, "c", "d"))
+			err = status.Errorf(codes.Unavailable, "")
+		case 4:
+			must(ss.SendMsg(&btpb.ReadRowsResponse{LastScannedRowKey: []byte("e")}))
+			err = status.Errorf(codes.Unavailable, "")
+		case 5:
+			if want, got := "e\x00", string(req.Rows.RowRanges[0].GetStartKeyClosed()); want != got {
+				t.Errorf("3 range retries: got %q, want %q", got, want)
+			}
+			must(writeReadRowsResponse(ss, "f", "g"))
 			err = nil
 		}
 		errCount++
@@ -424,7 +433,7 @@ func TestRetryReadRows(t *testing.T) {
 		got = append(got, r.Key())
 		return true
 	}))
-	want := []string{"a", "b", "c", "d"}
+	want := []string{"a", "b", "c", "d", "f", "g"}
 	if !testutil.Equal(got, want) {
 		t.Errorf("retry range integration: got %v, want %v", got, want)
 	}
@@ -435,8 +444,8 @@ func writeReadRowsResponse(ss grpc.ServerStream, rowKeys ...string) error {
 	for _, key := range rowKeys {
 		chunks = append(chunks, &btpb.ReadRowsResponse_CellChunk{
 			RowKey:     []byte(key),
-			FamilyName: &wrappers.StringValue{Value: "fm"},
-			Qualifier:  &wrappers.BytesValue{Value: []byte("col")},
+			FamilyName: &wrapperspb.StringValue{Value: "fm"},
+			Qualifier:  &wrapperspb.BytesValue{Value: []byte("col")},
 			RowStatus:  &btpb.ReadRowsResponse_CellChunk_CommitRow{CommitRow: true},
 		})
 	}

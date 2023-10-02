@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"net/http"
 	"net/url"
@@ -39,7 +39,6 @@ import (
 	httptransport "google.golang.org/api/transport/http"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -88,8 +87,11 @@ func defaultGRPCClientOptions() []option.ClientOption {
 
 func defaultCallOptions() *CallOptions {
 	return &CallOptions{
-		ExportAssets: []gax.CallOption{},
+		ExportAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		ListAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -102,6 +104,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		BatchGetAssetsHistory: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -113,8 +116,11 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		CreateFeed: []gax.CallOption{},
+		CreateFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		GetFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -127,6 +133,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		ListFeeds: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -138,8 +145,11 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		UpdateFeed: []gax.CallOption{},
+		UpdateFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		DeleteFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -152,6 +162,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		SearchAllResources: []gax.CallOption{
+			gax.WithTimeout(30000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.Unavailable,
@@ -163,6 +174,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		SearchAllIamPolicies: []gax.CallOption{
+			gax.WithTimeout(30000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.Unavailable,
@@ -174,6 +186,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		AnalyzeIamPolicy: []gax.CallOption{
+			gax.WithTimeout(300000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.Unavailable,
@@ -184,9 +197,12 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		AnalyzeIamPolicyLongrunning: []gax.CallOption{},
-		AnalyzeMove:                 []gax.CallOption{},
+		AnalyzeIamPolicyLongrunning: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		AnalyzeMove: []gax.CallOption{},
 		QueryAssets: []gax.CallOption{
+			gax.WithTimeout(200000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.Unavailable,
@@ -197,8 +213,11 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		CreateSavedQuery: []gax.CallOption{},
+		CreateSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		GetSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -211,6 +230,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		ListSavedQueries: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -222,8 +242,11 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		UpdateSavedQuery: []gax.CallOption{},
+		UpdateSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		DeleteSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.DeadlineExceeded,
@@ -236,6 +259,7 @@ func defaultCallOptions() *CallOptions {
 			}),
 		},
 		BatchGetEffectiveIamPolicies: []gax.CallOption{
+			gax.WithTimeout(300000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnCodes([]codes.Code{
 					codes.Unavailable,
@@ -246,17 +270,56 @@ func defaultCallOptions() *CallOptions {
 				})
 			}),
 		},
-		AnalyzeOrgPolicies:                 []gax.CallOption{},
-		AnalyzeOrgPolicyGovernedContainers: []gax.CallOption{},
-		AnalyzeOrgPolicyGovernedAssets:     []gax.CallOption{},
-		GetOperation:                       []gax.CallOption{},
+		AnalyzeOrgPolicies: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnCodes([]codes.Code{
+					codes.DeadlineExceeded,
+					codes.Unavailable,
+				}, gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				})
+			}),
+		},
+		AnalyzeOrgPolicyGovernedContainers: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnCodes([]codes.Code{
+					codes.DeadlineExceeded,
+					codes.Unavailable,
+				}, gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				})
+			}),
+		},
+		AnalyzeOrgPolicyGovernedAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnCodes([]codes.Code{
+					codes.DeadlineExceeded,
+					codes.Unavailable,
+				}, gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				})
+			}),
+		},
+		GetOperation: []gax.CallOption{},
 	}
 }
 
 func defaultRESTCallOptions() *CallOptions {
 	return &CallOptions{
-		ExportAssets: []gax.CallOption{},
+		ExportAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		ListAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -268,6 +331,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		BatchGetAssetsHistory: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -278,8 +342,11 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		CreateFeed: []gax.CallOption{},
+		CreateFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		GetFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -291,6 +358,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		ListFeeds: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -301,8 +369,11 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		UpdateFeed: []gax.CallOption{},
+		UpdateFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		DeleteFeed: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -314,6 +385,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		SearchAllResources: []gax.CallOption{
+			gax.WithTimeout(30000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -324,6 +396,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		SearchAllIamPolicies: []gax.CallOption{
+			gax.WithTimeout(30000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -334,6 +407,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		AnalyzeIamPolicy: []gax.CallOption{
+			gax.WithTimeout(300000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -343,9 +417,12 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		AnalyzeIamPolicyLongrunning: []gax.CallOption{},
-		AnalyzeMove:                 []gax.CallOption{},
+		AnalyzeIamPolicyLongrunning: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		AnalyzeMove: []gax.CallOption{},
 		QueryAssets: []gax.CallOption{
+			gax.WithTimeout(200000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -355,8 +432,11 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		CreateSavedQuery: []gax.CallOption{},
+		CreateSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		GetSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -368,6 +448,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		ListSavedQueries: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -378,8 +459,11 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		UpdateSavedQuery: []gax.CallOption{},
+		UpdateSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		DeleteSavedQuery: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -391,6 +475,7 @@ func defaultRESTCallOptions() *CallOptions {
 			}),
 		},
 		BatchGetEffectiveIamPolicies: []gax.CallOption{
+			gax.WithTimeout(300000 * time.Millisecond),
 			gax.WithRetry(func() gax.Retryer {
 				return gax.OnHTTPCodes(gax.Backoff{
 					Initial:    100 * time.Millisecond,
@@ -400,10 +485,43 @@ func defaultRESTCallOptions() *CallOptions {
 					http.StatusServiceUnavailable)
 			}),
 		},
-		AnalyzeOrgPolicies:                 []gax.CallOption{},
-		AnalyzeOrgPolicyGovernedContainers: []gax.CallOption{},
-		AnalyzeOrgPolicyGovernedAssets:     []gax.CallOption{},
-		GetOperation:                       []gax.CallOption{},
+		AnalyzeOrgPolicies: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnHTTPCodes(gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				},
+					http.StatusGatewayTimeout,
+					http.StatusServiceUnavailable)
+			}),
+		},
+		AnalyzeOrgPolicyGovernedContainers: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnHTTPCodes(gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				},
+					http.StatusGatewayTimeout,
+					http.StatusServiceUnavailable)
+			}),
+		},
+		AnalyzeOrgPolicyGovernedAssets: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+			gax.WithRetry(func() gax.Retryer {
+				return gax.OnHTTPCodes(gax.Backoff{
+					Initial:    100 * time.Millisecond,
+					Max:        60000 * time.Millisecond,
+					Multiplier: 1.30,
+				},
+					http.StatusGatewayTimeout,
+					http.StatusServiceUnavailable)
+			}),
+		},
+		GetOperation: []gax.CallOption{},
 	}
 }
 
@@ -596,8 +714,7 @@ func (c *Client) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveReques
 }
 
 // QueryAssets issue a job that queries assets using a SQL statement compatible with
-// BigQuery Standard
-// SQL (at http://cloud/bigquery/docs/reference/standard-sql/enabling-standard-sql).
+// BigQuery SQL (at https://cloud.google.com/bigquery/docs/introduction-sql).
 //
 // If the query execution finishes within timeout and there’s no pagination,
 // the full query results will be returned in the QueryAssetsResponse.
@@ -606,9 +723,8 @@ func (c *Client) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveReques
 // with the job_reference from the a previous QueryAssets call.
 //
 // Note, the query result has approximately 10 GB limitation enforced by
-// BigQuery
-// https://cloud.google.com/bigquery/docs/best-practices-performance-output (at https://cloud.google.com/bigquery/docs/best-practices-performance-output),
-// queries return larger results will result in errors.
+// BigQuery (at https://cloud.google.com/bigquery/docs/best-practices-performance-output).
+// Queries return larger results will result in errors.
 func (c *Client) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRequest, opts ...gax.CallOption) (*assetpb.QueryAssetsResponse, error) {
 	return c.internalClient.QueryAssets(ctx, req, opts...)
 }
@@ -698,9 +814,6 @@ type gRPCClient struct {
 	// Connection pool of gRPC connections to the service.
 	connPool gtransport.ConnPool
 
-	// flag to opt out of default deadlines via GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE
-	disableDeadlines bool
-
 	// Points back to the CallOptions field of the containing Client
 	CallOptions **CallOptions
 
@@ -715,7 +828,7 @@ type gRPCClient struct {
 	operationsClient longrunningpb.OperationsClient
 
 	// The x-goog-* metadata to be sent with each request.
-	xGoogMetadata metadata.MD
+	xGoogHeaders []string
 }
 
 // NewClient creates a new asset service client based on gRPC.
@@ -732,11 +845,6 @@ func NewClient(ctx context.Context, opts ...option.ClientOption) (*Client, error
 		clientOpts = append(clientOpts, hookOpts...)
 	}
 
-	disableDeadlines, err := checkDisableDeadlines()
-	if err != nil {
-		return nil, err
-	}
-
 	connPool, err := gtransport.DialPool(ctx, append(clientOpts, opts...)...)
 	if err != nil {
 		return nil, err
@@ -745,7 +853,6 @@ func NewClient(ctx context.Context, opts ...option.ClientOption) (*Client, error
 
 	c := &gRPCClient{
 		connPool:         connPool,
-		disableDeadlines: disableDeadlines,
 		client:           assetpb.NewAssetServiceClient(connPool),
 		CallOptions:      &client.CallOptions,
 		operationsClient: longrunningpb.NewOperationsClient(connPool),
@@ -780,9 +887,9 @@ func (c *gRPCClient) Connection() *grpc.ClientConn {
 // the `x-goog-api-client` header passed on each request. Intended for
 // use by Google-written clients.
 func (c *gRPCClient) setGoogleClientInfo(keyval ...string) {
-	kv := append([]string{"gl-go", versionGo()}, keyval...)
+	kv := append([]string{"gl-go", gax.GoVersion}, keyval...)
 	kv = append(kv, "gapic", getVersionClient(), "gax", gax.Version, "grpc", grpc.Version)
-	c.xGoogMetadata = metadata.Pairs("x-goog-api-client", gax.XGoogHeader(kv...))
+	c.xGoogHeaders = []string{"x-goog-api-client", gax.XGoogHeader(kv...)}
 }
 
 // Close closes the connection to the API service. The user should invoke this when
@@ -804,8 +911,8 @@ type restClient struct {
 	// Users should not Close this client.
 	LROClient **lroauto.OperationsClient
 
-	// The x-goog-* metadata to be sent with each request.
-	xGoogMetadata metadata.MD
+	// The x-goog-* headers to be sent with each request.
+	xGoogHeaders []string
 
 	// Points back to the CallOptions field of the containing Client
 	CallOptions **CallOptions
@@ -855,9 +962,9 @@ func defaultRESTClientOptions() []option.ClientOption {
 // the `x-goog-api-client` header passed on each request. Intended for
 // use by Google-written clients.
 func (c *restClient) setGoogleClientInfo(keyval ...string) {
-	kv := append([]string{"gl-go", versionGo()}, keyval...)
+	kv := append([]string{"gl-go", gax.GoVersion}, keyval...)
 	kv = append(kv, "gapic", getVersionClient(), "gax", gax.Version, "rest", "UNKNOWN")
-	c.xGoogMetadata = metadata.Pairs("x-goog-api-client", gax.XGoogHeader(kv...))
+	c.xGoogHeaders = []string{"x-goog-api-client", gax.XGoogHeader(kv...)}
 }
 
 // Close closes the connection to the API service. The user should invoke this when
@@ -875,14 +982,10 @@ func (c *restClient) Connection() *grpc.ClientConn {
 	return nil
 }
 func (c *gRPCClient) ExportAssets(ctx context.Context, req *assetpb.ExportAssetsRequest, opts ...gax.CallOption) (*ExportAssetsOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ExportAssets[0:len((*c.CallOptions).ExportAssets):len((*c.CallOptions).ExportAssets)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -899,9 +1002,10 @@ func (c *gRPCClient) ExportAssets(ctx context.Context, req *assetpb.ExportAssets
 }
 
 func (c *gRPCClient) ListAssets(ctx context.Context, req *assetpb.ListAssetsRequest, opts ...gax.CallOption) *AssetIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListAssets[0:len((*c.CallOptions).ListAssets):len((*c.CallOptions).ListAssets)], opts...)
 	it := &AssetIterator{}
 	req = proto.Clone(req).(*assetpb.ListAssetsRequest)
@@ -944,14 +1048,10 @@ func (c *gRPCClient) ListAssets(ctx context.Context, req *assetpb.ListAssetsRequ
 }
 
 func (c *gRPCClient) BatchGetAssetsHistory(ctx context.Context, req *assetpb.BatchGetAssetsHistoryRequest, opts ...gax.CallOption) (*assetpb.BatchGetAssetsHistoryResponse, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).BatchGetAssetsHistory[0:len((*c.CallOptions).BatchGetAssetsHistory):len((*c.CallOptions).BatchGetAssetsHistory)], opts...)
 	var resp *assetpb.BatchGetAssetsHistoryResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -966,14 +1066,10 @@ func (c *gRPCClient) BatchGetAssetsHistory(ctx context.Context, req *assetpb.Bat
 }
 
 func (c *gRPCClient) CreateFeed(ctx context.Context, req *assetpb.CreateFeedRequest, opts ...gax.CallOption) (*assetpb.Feed, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateFeed[0:len((*c.CallOptions).CreateFeed):len((*c.CallOptions).CreateFeed)], opts...)
 	var resp *assetpb.Feed
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -988,14 +1084,10 @@ func (c *gRPCClient) CreateFeed(ctx context.Context, req *assetpb.CreateFeedRequ
 }
 
 func (c *gRPCClient) GetFeed(ctx context.Context, req *assetpb.GetFeedRequest, opts ...gax.CallOption) (*assetpb.Feed, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetFeed[0:len((*c.CallOptions).GetFeed):len((*c.CallOptions).GetFeed)], opts...)
 	var resp *assetpb.Feed
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1010,14 +1102,10 @@ func (c *gRPCClient) GetFeed(ctx context.Context, req *assetpb.GetFeedRequest, o
 }
 
 func (c *gRPCClient) ListFeeds(ctx context.Context, req *assetpb.ListFeedsRequest, opts ...gax.CallOption) (*assetpb.ListFeedsResponse, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListFeeds[0:len((*c.CallOptions).ListFeeds):len((*c.CallOptions).ListFeeds)], opts...)
 	var resp *assetpb.ListFeedsResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1032,14 +1120,10 @@ func (c *gRPCClient) ListFeeds(ctx context.Context, req *assetpb.ListFeedsReques
 }
 
 func (c *gRPCClient) UpdateFeed(ctx context.Context, req *assetpb.UpdateFeedRequest, opts ...gax.CallOption) (*assetpb.Feed, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "feed.name", url.QueryEscape(req.GetFeed().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "feed.name", url.QueryEscape(req.GetFeed().GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateFeed[0:len((*c.CallOptions).UpdateFeed):len((*c.CallOptions).UpdateFeed)], opts...)
 	var resp *assetpb.Feed
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1054,14 +1138,10 @@ func (c *gRPCClient) UpdateFeed(ctx context.Context, req *assetpb.UpdateFeedRequ
 }
 
 func (c *gRPCClient) DeleteFeed(ctx context.Context, req *assetpb.DeleteFeedRequest, opts ...gax.CallOption) error {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteFeed[0:len((*c.CallOptions).DeleteFeed):len((*c.CallOptions).DeleteFeed)], opts...)
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		var err error
@@ -1072,9 +1152,10 @@ func (c *gRPCClient) DeleteFeed(ctx context.Context, req *assetpb.DeleteFeedRequ
 }
 
 func (c *gRPCClient) SearchAllResources(ctx context.Context, req *assetpb.SearchAllResourcesRequest, opts ...gax.CallOption) *ResourceSearchResultIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).SearchAllResources[0:len((*c.CallOptions).SearchAllResources):len((*c.CallOptions).SearchAllResources)], opts...)
 	it := &ResourceSearchResultIterator{}
 	req = proto.Clone(req).(*assetpb.SearchAllResourcesRequest)
@@ -1117,9 +1198,10 @@ func (c *gRPCClient) SearchAllResources(ctx context.Context, req *assetpb.Search
 }
 
 func (c *gRPCClient) SearchAllIamPolicies(ctx context.Context, req *assetpb.SearchAllIamPoliciesRequest, opts ...gax.CallOption) *IamPolicySearchResultIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).SearchAllIamPolicies[0:len((*c.CallOptions).SearchAllIamPolicies):len((*c.CallOptions).SearchAllIamPolicies)], opts...)
 	it := &IamPolicySearchResultIterator{}
 	req = proto.Clone(req).(*assetpb.SearchAllIamPoliciesRequest)
@@ -1162,14 +1244,10 @@ func (c *gRPCClient) SearchAllIamPolicies(ctx context.Context, req *assetpb.Sear
 }
 
 func (c *gRPCClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeIamPolicyRequest, opts ...gax.CallOption) (*assetpb.AnalyzeIamPolicyResponse, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 300000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeIamPolicy[0:len((*c.CallOptions).AnalyzeIamPolicy):len((*c.CallOptions).AnalyzeIamPolicy)], opts...)
 	var resp *assetpb.AnalyzeIamPolicyResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1184,14 +1262,10 @@ func (c *gRPCClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeI
 }
 
 func (c *gRPCClient) AnalyzeIamPolicyLongrunning(ctx context.Context, req *assetpb.AnalyzeIamPolicyLongrunningRequest, opts ...gax.CallOption) (*AnalyzeIamPolicyLongrunningOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeIamPolicyLongrunning[0:len((*c.CallOptions).AnalyzeIamPolicyLongrunning):len((*c.CallOptions).AnalyzeIamPolicyLongrunning)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1208,9 +1282,10 @@ func (c *gRPCClient) AnalyzeIamPolicyLongrunning(ctx context.Context, req *asset
 }
 
 func (c *gRPCClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRequest, opts ...gax.CallOption) (*assetpb.AnalyzeMoveResponse, error) {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "resource", url.QueryEscape(req.GetResource())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "resource", url.QueryEscape(req.GetResource()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeMove[0:len((*c.CallOptions).AnalyzeMove):len((*c.CallOptions).AnalyzeMove)], opts...)
 	var resp *assetpb.AnalyzeMoveResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1225,14 +1300,10 @@ func (c *gRPCClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRe
 }
 
 func (c *gRPCClient) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRequest, opts ...gax.CallOption) (*assetpb.QueryAssetsResponse, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 200000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).QueryAssets[0:len((*c.CallOptions).QueryAssets):len((*c.CallOptions).QueryAssets)], opts...)
 	var resp *assetpb.QueryAssetsResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1247,14 +1318,10 @@ func (c *gRPCClient) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRe
 }
 
 func (c *gRPCClient) CreateSavedQuery(ctx context.Context, req *assetpb.CreateSavedQueryRequest, opts ...gax.CallOption) (*assetpb.SavedQuery, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateSavedQuery[0:len((*c.CallOptions).CreateSavedQuery):len((*c.CallOptions).CreateSavedQuery)], opts...)
 	var resp *assetpb.SavedQuery
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1269,14 +1336,10 @@ func (c *gRPCClient) CreateSavedQuery(ctx context.Context, req *assetpb.CreateSa
 }
 
 func (c *gRPCClient) GetSavedQuery(ctx context.Context, req *assetpb.GetSavedQueryRequest, opts ...gax.CallOption) (*assetpb.SavedQuery, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetSavedQuery[0:len((*c.CallOptions).GetSavedQuery):len((*c.CallOptions).GetSavedQuery)], opts...)
 	var resp *assetpb.SavedQuery
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1291,9 +1354,10 @@ func (c *gRPCClient) GetSavedQuery(ctx context.Context, req *assetpb.GetSavedQue
 }
 
 func (c *gRPCClient) ListSavedQueries(ctx context.Context, req *assetpb.ListSavedQueriesRequest, opts ...gax.CallOption) *SavedQueryIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListSavedQueries[0:len((*c.CallOptions).ListSavedQueries):len((*c.CallOptions).ListSavedQueries)], opts...)
 	it := &SavedQueryIterator{}
 	req = proto.Clone(req).(*assetpb.ListSavedQueriesRequest)
@@ -1336,14 +1400,10 @@ func (c *gRPCClient) ListSavedQueries(ctx context.Context, req *assetpb.ListSave
 }
 
 func (c *gRPCClient) UpdateSavedQuery(ctx context.Context, req *assetpb.UpdateSavedQueryRequest, opts ...gax.CallOption) (*assetpb.SavedQuery, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "saved_query.name", url.QueryEscape(req.GetSavedQuery().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "saved_query.name", url.QueryEscape(req.GetSavedQuery().GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateSavedQuery[0:len((*c.CallOptions).UpdateSavedQuery):len((*c.CallOptions).UpdateSavedQuery)], opts...)
 	var resp *assetpb.SavedQuery
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1358,14 +1418,10 @@ func (c *gRPCClient) UpdateSavedQuery(ctx context.Context, req *assetpb.UpdateSa
 }
 
 func (c *gRPCClient) DeleteSavedQuery(ctx context.Context, req *assetpb.DeleteSavedQueryRequest, opts ...gax.CallOption) error {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteSavedQuery[0:len((*c.CallOptions).DeleteSavedQuery):len((*c.CallOptions).DeleteSavedQuery)], opts...)
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		var err error
@@ -1376,14 +1432,10 @@ func (c *gRPCClient) DeleteSavedQuery(ctx context.Context, req *assetpb.DeleteSa
 }
 
 func (c *gRPCClient) BatchGetEffectiveIamPolicies(ctx context.Context, req *assetpb.BatchGetEffectiveIamPoliciesRequest, opts ...gax.CallOption) (*assetpb.BatchGetEffectiveIamPoliciesResponse, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 300000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).BatchGetEffectiveIamPolicies[0:len((*c.CallOptions).BatchGetEffectiveIamPolicies):len((*c.CallOptions).BatchGetEffectiveIamPolicies)], opts...)
 	var resp *assetpb.BatchGetEffectiveIamPoliciesResponse
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1398,9 +1450,10 @@ func (c *gRPCClient) BatchGetEffectiveIamPolicies(ctx context.Context, req *asse
 }
 
 func (c *gRPCClient) AnalyzeOrgPolicies(ctx context.Context, req *assetpb.AnalyzeOrgPoliciesRequest, opts ...gax.CallOption) *AnalyzeOrgPoliciesResponse_OrgPolicyResultIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeOrgPolicies[0:len((*c.CallOptions).AnalyzeOrgPolicies):len((*c.CallOptions).AnalyzeOrgPolicies)], opts...)
 	it := &AnalyzeOrgPoliciesResponse_OrgPolicyResultIterator{}
 	req = proto.Clone(req).(*assetpb.AnalyzeOrgPoliciesRequest)
@@ -1443,9 +1496,10 @@ func (c *gRPCClient) AnalyzeOrgPolicies(ctx context.Context, req *assetpb.Analyz
 }
 
 func (c *gRPCClient) AnalyzeOrgPolicyGovernedContainers(ctx context.Context, req *assetpb.AnalyzeOrgPolicyGovernedContainersRequest, opts ...gax.CallOption) *AnalyzeOrgPolicyGovernedContainersResponse_GovernedContainerIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeOrgPolicyGovernedContainers[0:len((*c.CallOptions).AnalyzeOrgPolicyGovernedContainers):len((*c.CallOptions).AnalyzeOrgPolicyGovernedContainers)], opts...)
 	it := &AnalyzeOrgPolicyGovernedContainersResponse_GovernedContainerIterator{}
 	req = proto.Clone(req).(*assetpb.AnalyzeOrgPolicyGovernedContainersRequest)
@@ -1488,9 +1542,10 @@ func (c *gRPCClient) AnalyzeOrgPolicyGovernedContainers(ctx context.Context, req
 }
 
 func (c *gRPCClient) AnalyzeOrgPolicyGovernedAssets(ctx context.Context, req *assetpb.AnalyzeOrgPolicyGovernedAssetsRequest, opts ...gax.CallOption) *AnalyzeOrgPolicyGovernedAssetsResponse_GovernedAssetIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeOrgPolicyGovernedAssets[0:len((*c.CallOptions).AnalyzeOrgPolicyGovernedAssets):len((*c.CallOptions).AnalyzeOrgPolicyGovernedAssets)], opts...)
 	it := &AnalyzeOrgPolicyGovernedAssetsResponse_GovernedAssetIterator{}
 	req = proto.Clone(req).(*assetpb.AnalyzeOrgPolicyGovernedAssetsRequest)
@@ -1533,9 +1588,10 @@ func (c *gRPCClient) AnalyzeOrgPolicyGovernedAssets(ctx context.Context, req *as
 }
 
 func (c *gRPCClient) GetOperation(ctx context.Context, req *longrunningpb.GetOperationRequest, opts ...gax.CallOption) (*longrunningpb.Operation, error) {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetOperation[0:len((*c.CallOptions).GetOperation):len((*c.CallOptions).GetOperation)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1579,9 +1635,11 @@ func (c *restClient) ExportAssets(ctx context.Context, req *assetpb.ExportAssets
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &longrunningpb.Operation{}
 	e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1605,13 +1663,13 @@ func (c *restClient) ExportAssets(ctx context.Context, req *assetpb.ExportAssets
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -1670,7 +1728,7 @@ func (c *restClient) ListAssets(ctx context.Context, req *assetpb.ListAssetsRequ
 			if err != nil {
 				return nil, "", err
 			}
-			params.Add("readTime", string(readTime))
+			params.Add("readTime", string(readTime[1:len(readTime)-1]))
 		}
 		if items := req.GetRelationshipTypes(); len(items) > 0 {
 			for _, item := range items {
@@ -1681,7 +1739,8 @@ func (c *restClient) ListAssets(ctx context.Context, req *assetpb.ListAssetsRequ
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -1702,13 +1761,13 @@ func (c *restClient) ListAssets(ctx context.Context, req *assetpb.ListAssetsRequ
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -1765,14 +1824,14 @@ func (c *restClient) BatchGetAssetsHistory(ctx context.Context, req *assetpb.Bat
 		if err != nil {
 			return nil, err
 		}
-		params.Add("readTimeWindow.endTime", string(endTime))
+		params.Add("readTimeWindow.endTime", string(endTime[1:len(endTime)-1]))
 	}
 	if req.GetReadTimeWindow().GetStartTime() != nil {
 		startTime, err := protojson.Marshal(req.GetReadTimeWindow().GetStartTime())
 		if err != nil {
 			return nil, err
 		}
-		params.Add("readTimeWindow.startTime", string(startTime))
+		params.Add("readTimeWindow.startTime", string(startTime[1:len(startTime)-1]))
 	}
 	if items := req.GetRelationshipTypes(); len(items) > 0 {
 		for _, item := range items {
@@ -1783,9 +1842,11 @@ func (c *restClient) BatchGetAssetsHistory(ctx context.Context, req *assetpb.Bat
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).BatchGetAssetsHistory[0:len((*c.CallOptions).BatchGetAssetsHistory):len((*c.CallOptions).BatchGetAssetsHistory)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.BatchGetAssetsHistoryResponse{}
@@ -1810,13 +1871,13 @@ func (c *restClient) BatchGetAssetsHistory(ctx context.Context, req *assetpb.Bat
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -1848,9 +1909,11 @@ func (c *restClient) CreateFeed(ctx context.Context, req *assetpb.CreateFeedRequ
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).CreateFeed[0:len((*c.CallOptions).CreateFeed):len((*c.CallOptions).CreateFeed)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.Feed{}
@@ -1875,13 +1938,13 @@ func (c *restClient) CreateFeed(ctx context.Context, req *assetpb.CreateFeedRequ
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -1906,9 +1969,11 @@ func (c *restClient) GetFeed(ctx context.Context, req *assetpb.GetFeedRequest, o
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).GetFeed[0:len((*c.CallOptions).GetFeed):len((*c.CallOptions).GetFeed)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.Feed{}
@@ -1933,13 +1998,13 @@ func (c *restClient) GetFeed(ctx context.Context, req *assetpb.GetFeedRequest, o
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -1964,9 +2029,11 @@ func (c *restClient) ListFeeds(ctx context.Context, req *assetpb.ListFeedsReques
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).ListFeeds[0:len((*c.CallOptions).ListFeeds):len((*c.CallOptions).ListFeeds)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.ListFeedsResponse{}
@@ -1991,13 +2058,13 @@ func (c *restClient) ListFeeds(ctx context.Context, req *assetpb.ListFeedsReques
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2028,9 +2095,11 @@ func (c *restClient) UpdateFeed(ctx context.Context, req *assetpb.UpdateFeedRequ
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "feed.name", url.QueryEscape(req.GetFeed().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "feed.name", url.QueryEscape(req.GetFeed().GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateFeed[0:len((*c.CallOptions).UpdateFeed):len((*c.CallOptions).UpdateFeed)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.Feed{}
@@ -2055,13 +2124,13 @@ func (c *restClient) UpdateFeed(ctx context.Context, req *assetpb.UpdateFeedRequ
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2086,9 +2155,11 @@ func (c *restClient) DeleteFeed(ctx context.Context, req *assetpb.DeleteFeedRequ
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	return gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		if settings.Path != "" {
 			baseUrl.Path = settings.Path
@@ -2160,13 +2231,14 @@ func (c *restClient) SearchAllResources(ctx context.Context, req *assetpb.Search
 			if err != nil {
 				return nil, "", err
 			}
-			params.Add("readMask", string(readMask))
+			params.Add("readMask", string(readMask[1:len(readMask)-1]))
 		}
 
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -2187,13 +2259,13 @@ func (c *restClient) SearchAllResources(ctx context.Context, req *assetpb.Search
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -2268,7 +2340,8 @@ func (c *restClient) SearchAllIamPolicies(ctx context.Context, req *assetpb.Sear
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -2289,13 +2362,13 @@ func (c *restClient) SearchAllIamPolicies(ctx context.Context, req *assetpb.Sear
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -2349,7 +2422,7 @@ func (c *restClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeI
 		if err != nil {
 			return nil, err
 		}
-		params.Add("analysisQuery.conditionContext.accessTime", string(accessTime))
+		params.Add("analysisQuery.conditionContext.accessTime", string(accessTime[1:len(accessTime)-1]))
 	}
 	params.Add("analysisQuery.identitySelector.identity", fmt.Sprintf("%v", req.GetAnalysisQuery().GetIdentitySelector().GetIdentity()))
 	if req.GetAnalysisQuery().GetOptions().GetAnalyzeServiceAccountImpersonation() {
@@ -2376,7 +2449,7 @@ func (c *restClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeI
 		if err != nil {
 			return nil, err
 		}
-		params.Add("executionTimeout", string(executionTimeout))
+		params.Add("executionTimeout", string(executionTimeout[1:len(executionTimeout)-1]))
 	}
 	if req.GetSavedAnalysisQuery() != "" {
 		params.Add("savedAnalysisQuery", fmt.Sprintf("%v", req.GetSavedAnalysisQuery()))
@@ -2385,9 +2458,11 @@ func (c *restClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeI
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeIamPolicy[0:len((*c.CallOptions).AnalyzeIamPolicy):len((*c.CallOptions).AnalyzeIamPolicy)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.AnalyzeIamPolicyResponse{}
@@ -2412,13 +2487,13 @@ func (c *restClient) AnalyzeIamPolicy(ctx context.Context, req *assetpb.AnalyzeI
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2458,9 +2533,11 @@ func (c *restClient) AnalyzeIamPolicyLongrunning(ctx context.Context, req *asset
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "analysis_query.scope", url.QueryEscape(req.GetAnalysisQuery().GetScope()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &longrunningpb.Operation{}
 	e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -2484,13 +2561,13 @@ func (c *restClient) AnalyzeIamPolicyLongrunning(ctx context.Context, req *asset
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2528,9 +2605,11 @@ func (c *restClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRe
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "resource", url.QueryEscape(req.GetResource())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "resource", url.QueryEscape(req.GetResource()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).AnalyzeMove[0:len((*c.CallOptions).AnalyzeMove):len((*c.CallOptions).AnalyzeMove)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.AnalyzeMoveResponse{}
@@ -2555,13 +2634,13 @@ func (c *restClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRe
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2573,8 +2652,7 @@ func (c *restClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRe
 }
 
 // QueryAssets issue a job that queries assets using a SQL statement compatible with
-// BigQuery Standard
-// SQL (at http://cloud/bigquery/docs/reference/standard-sql/enabling-standard-sql).
+// BigQuery SQL (at https://cloud.google.com/bigquery/docs/introduction-sql).
 //
 // If the query execution finishes within timeout and there’s no pagination,
 // the full query results will be returned in the QueryAssetsResponse.
@@ -2583,9 +2661,8 @@ func (c *restClient) AnalyzeMove(ctx context.Context, req *assetpb.AnalyzeMoveRe
 // with the job_reference from the a previous QueryAssets call.
 //
 // Note, the query result has approximately 10 GB limitation enforced by
-// BigQuery
-// https://cloud.google.com/bigquery/docs/best-practices-performance-output (at https://cloud.google.com/bigquery/docs/best-practices-performance-output),
-// queries return larger results will result in errors.
+// BigQuery (at https://cloud.google.com/bigquery/docs/best-practices-performance-output).
+// Queries return larger results will result in errors.
 func (c *restClient) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRequest, opts ...gax.CallOption) (*assetpb.QueryAssetsResponse, error) {
 	m := protojson.MarshalOptions{AllowPartial: true, UseEnumNumbers: true}
 	jsonReq, err := m.Marshal(req)
@@ -2605,9 +2682,11 @@ func (c *restClient) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRe
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).QueryAssets[0:len((*c.CallOptions).QueryAssets):len((*c.CallOptions).QueryAssets)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.QueryAssetsResponse{}
@@ -2632,13 +2711,13 @@ func (c *restClient) QueryAssets(ctx context.Context, req *assetpb.QueryAssetsRe
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2671,9 +2750,11 @@ func (c *restClient) CreateSavedQuery(ctx context.Context, req *assetpb.CreateSa
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).CreateSavedQuery[0:len((*c.CallOptions).CreateSavedQuery):len((*c.CallOptions).CreateSavedQuery)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.SavedQuery{}
@@ -2698,13 +2779,13 @@ func (c *restClient) CreateSavedQuery(ctx context.Context, req *assetpb.CreateSa
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2729,9 +2810,11 @@ func (c *restClient) GetSavedQuery(ctx context.Context, req *assetpb.GetSavedQue
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).GetSavedQuery[0:len((*c.CallOptions).GetSavedQuery):len((*c.CallOptions).GetSavedQuery)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.SavedQuery{}
@@ -2756,13 +2839,13 @@ func (c *restClient) GetSavedQuery(ctx context.Context, req *assetpb.GetSavedQue
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2809,7 +2892,8 @@ func (c *restClient) ListSavedQueries(ctx context.Context, req *assetpb.ListSave
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -2830,13 +2914,13 @@ func (c *restClient) ListSavedQueries(ctx context.Context, req *assetpb.ListSave
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -2886,15 +2970,17 @@ func (c *restClient) UpdateSavedQuery(ctx context.Context, req *assetpb.UpdateSa
 		if err != nil {
 			return nil, err
 		}
-		params.Add("updateMask", string(updateMask))
+		params.Add("updateMask", string(updateMask[1:len(updateMask)-1]))
 	}
 
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "saved_query.name", url.QueryEscape(req.GetSavedQuery().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "saved_query.name", url.QueryEscape(req.GetSavedQuery().GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateSavedQuery[0:len((*c.CallOptions).UpdateSavedQuery):len((*c.CallOptions).UpdateSavedQuery)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.SavedQuery{}
@@ -2919,13 +3005,13 @@ func (c *restClient) UpdateSavedQuery(ctx context.Context, req *assetpb.UpdateSa
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -2950,9 +3036,11 @@ func (c *restClient) DeleteSavedQuery(ctx context.Context, req *assetpb.DeleteSa
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	return gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		if settings.Path != "" {
 			baseUrl.Path = settings.Path
@@ -2995,9 +3083,11 @@ func (c *restClient) BatchGetEffectiveIamPolicies(ctx context.Context, req *asse
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "scope", url.QueryEscape(req.GetScope()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).BatchGetEffectiveIamPolicies[0:len((*c.CallOptions).BatchGetEffectiveIamPolicies):len((*c.CallOptions).BatchGetEffectiveIamPolicies)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &assetpb.BatchGetEffectiveIamPoliciesResponse{}
@@ -3022,13 +3112,13 @@ func (c *restClient) BatchGetEffectiveIamPolicies(ctx context.Context, req *asse
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil
@@ -3076,7 +3166,8 @@ func (c *restClient) AnalyzeOrgPolicies(ctx context.Context, req *assetpb.Analyz
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -3097,13 +3188,13 @@ func (c *restClient) AnalyzeOrgPolicies(ctx context.Context, req *assetpb.Analyz
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -3169,7 +3260,8 @@ func (c *restClient) AnalyzeOrgPolicyGovernedContainers(ctx context.Context, req
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -3190,13 +3282,13 @@ func (c *restClient) AnalyzeOrgPolicyGovernedContainers(ctx context.Context, req
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -3288,7 +3380,8 @@ func (c *restClient) AnalyzeOrgPolicyGovernedAssets(ctx context.Context, req *as
 		baseUrl.RawQuery = params.Encode()
 
 		// Build HTTP headers from client and context metadata.
-		headers := buildHeaders(ctx, c.xGoogMetadata, metadata.Pairs("Content-Type", "application/json"))
+		hds := append(c.xGoogHeaders, "Content-Type", "application/json")
+		headers := gax.BuildHeaders(ctx, hds...)
 		e := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 			if settings.Path != "" {
 				baseUrl.Path = settings.Path
@@ -3309,13 +3402,13 @@ func (c *restClient) AnalyzeOrgPolicyGovernedAssets(ctx context.Context, req *as
 				return err
 			}
 
-			buf, err := ioutil.ReadAll(httpRsp.Body)
+			buf, err := io.ReadAll(httpRsp.Body)
 			if err != nil {
 				return err
 			}
 
 			if err := unm.Unmarshal(buf, resp); err != nil {
-				return maybeUnknownEnum(err)
+				return err
 			}
 
 			return nil
@@ -3357,9 +3450,11 @@ func (c *restClient) GetOperation(ctx context.Context, req *longrunningpb.GetOpe
 	baseUrl.RawQuery = params.Encode()
 
 	// Build HTTP headers from client and context metadata.
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	headers := buildHeaders(ctx, c.xGoogMetadata, md, metadata.Pairs("Content-Type", "application/json"))
+	hds = append(c.xGoogHeaders, hds...)
+	hds = append(hds, "Content-Type", "application/json")
+	headers := gax.BuildHeaders(ctx, hds...)
 	opts = append((*c.CallOptions).GetOperation[0:len((*c.CallOptions).GetOperation):len((*c.CallOptions).GetOperation)], opts...)
 	unm := protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
 	resp := &longrunningpb.Operation{}
@@ -3384,13 +3479,13 @@ func (c *restClient) GetOperation(ctx context.Context, req *longrunningpb.GetOpe
 			return err
 		}
 
-		buf, err := ioutil.ReadAll(httpRsp.Body)
+		buf, err := io.ReadAll(httpRsp.Body)
 		if err != nil {
 			return err
 		}
 
 		if err := unm.Unmarshal(buf, resp); err != nil {
-			return maybeUnknownEnum(err)
+			return err
 		}
 
 		return nil

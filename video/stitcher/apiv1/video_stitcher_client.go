@@ -33,8 +33,6 @@ import (
 	"google.golang.org/api/option/internaloption"
 	gtransport "google.golang.org/api/transport/grpc"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -86,69 +84,77 @@ func defaultVideoStitcherGRPCClientOptions() []option.ClientOption {
 
 func defaultVideoStitcherCallOptions() *VideoStitcherCallOptions {
 	return &VideoStitcherCallOptions{
-		CreateCdnKey:         []gax.CallOption{},
-		ListCdnKeys:          []gax.CallOption{},
-		GetCdnKey:            []gax.CallOption{},
-		DeleteCdnKey:         []gax.CallOption{},
-		UpdateCdnKey:         []gax.CallOption{},
-		CreateVodSession:     []gax.CallOption{},
-		GetVodSession:        []gax.CallOption{},
-		ListVodStitchDetails: []gax.CallOption{},
-		GetVodStitchDetail:   []gax.CallOption{},
-		ListVodAdTagDetails:  []gax.CallOption{},
-		GetVodAdTagDetail:    []gax.CallOption{},
-		ListLiveAdTagDetails: []gax.CallOption{},
-		GetLiveAdTagDetail:   []gax.CallOption{},
-		CreateSlate:          []gax.CallOption{},
-		ListSlates:           []gax.CallOption{},
-		GetSlate:             []gax.CallOption{},
-		UpdateSlate:          []gax.CallOption{},
-		DeleteSlate:          []gax.CallOption{},
-		CreateLiveSession:    []gax.CallOption{},
-		GetLiveSession:       []gax.CallOption{},
+		CreateCdnKey: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		ListCdnKeys: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetCdnKey: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		DeleteCdnKey: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		UpdateCdnKey: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		CreateVodSession: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetVodSession: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		ListVodStitchDetails: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetVodStitchDetail: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		ListVodAdTagDetails: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetVodAdTagDetail: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		ListLiveAdTagDetails: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetLiveAdTagDetail: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		CreateSlate: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		ListSlates: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetSlate: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		UpdateSlate: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		DeleteSlate: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		CreateLiveSession: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
+		GetLiveSession: []gax.CallOption{
+			gax.WithTimeout(60000 * time.Millisecond),
+		},
 		CreateLiveConfig: []gax.CallOption{
-			gax.WithRetry(func() gax.Retryer {
-				return gax.OnCodes([]codes.Code{
-					codes.Unavailable,
-				}, gax.Backoff{
-					Initial:    1000 * time.Millisecond,
-					Max:        10000 * time.Millisecond,
-					Multiplier: 1.30,
-				})
-			}),
+			gax.WithTimeout(60000 * time.Millisecond),
 		},
 		ListLiveConfigs: []gax.CallOption{
-			gax.WithRetry(func() gax.Retryer {
-				return gax.OnCodes([]codes.Code{
-					codes.Unavailable,
-				}, gax.Backoff{
-					Initial:    1000 * time.Millisecond,
-					Max:        10000 * time.Millisecond,
-					Multiplier: 1.30,
-				})
-			}),
+			gax.WithTimeout(60000 * time.Millisecond),
 		},
 		GetLiveConfig: []gax.CallOption{
-			gax.WithRetry(func() gax.Retryer {
-				return gax.OnCodes([]codes.Code{
-					codes.Unavailable,
-				}, gax.Backoff{
-					Initial:    1000 * time.Millisecond,
-					Max:        10000 * time.Millisecond,
-					Multiplier: 1.30,
-				})
-			}),
+			gax.WithTimeout(60000 * time.Millisecond),
 		},
 		DeleteLiveConfig: []gax.CallOption{
-			gax.WithRetry(func() gax.Retryer {
-				return gax.OnCodes([]codes.Code{
-					codes.Unavailable,
-				}, gax.Backoff{
-					Initial:    1000 * time.Millisecond,
-					Max:        10000 * time.Millisecond,
-					Multiplier: 1.30,
-				})
-			}),
+			gax.WithTimeout(60000 * time.Millisecond),
 		},
 		CancelOperation: []gax.CallOption{},
 		DeleteOperation: []gax.CallOption{},
@@ -434,8 +440,7 @@ func (c *VideoStitcherClient) GetOperation(ctx context.Context, req *longrunning
 	return c.internalClient.GetOperation(ctx, req, opts...)
 }
 
-// ListOperations lists operations that match the specified filter in the request. If
-// the server doesn’t support this method, it returns UNIMPLEMENTED.
+// ListOperations is a utility method from google.longrunning.Operations.
 func (c *VideoStitcherClient) ListOperations(ctx context.Context, req *longrunningpb.ListOperationsRequest, opts ...gax.CallOption) *OperationIterator {
 	return c.internalClient.ListOperations(ctx, req, opts...)
 }
@@ -446,9 +451,6 @@ func (c *VideoStitcherClient) ListOperations(ctx context.Context, req *longrunni
 type videoStitcherGRPCClient struct {
 	// Connection pool of gRPC connections to the service.
 	connPool gtransport.ConnPool
-
-	// flag to opt out of default deadlines via GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE
-	disableDeadlines bool
 
 	// Points back to the CallOptions field of the containing VideoStitcherClient
 	CallOptions **VideoStitcherCallOptions
@@ -464,7 +466,7 @@ type videoStitcherGRPCClient struct {
 	operationsClient longrunningpb.OperationsClient
 
 	// The x-goog-* metadata to be sent with each request.
-	xGoogMetadata metadata.MD
+	xGoogHeaders []string
 }
 
 // NewVideoStitcherClient creates a new video stitcher service client based on gRPC.
@@ -485,11 +487,6 @@ func NewVideoStitcherClient(ctx context.Context, opts ...option.ClientOption) (*
 		clientOpts = append(clientOpts, hookOpts...)
 	}
 
-	disableDeadlines, err := checkDisableDeadlines()
-	if err != nil {
-		return nil, err
-	}
-
 	connPool, err := gtransport.DialPool(ctx, append(clientOpts, opts...)...)
 	if err != nil {
 		return nil, err
@@ -498,7 +495,6 @@ func NewVideoStitcherClient(ctx context.Context, opts ...option.ClientOption) (*
 
 	c := &videoStitcherGRPCClient{
 		connPool:            connPool,
-		disableDeadlines:    disableDeadlines,
 		videoStitcherClient: stitcherpb.NewVideoStitcherServiceClient(connPool),
 		CallOptions:         &client.CallOptions,
 		operationsClient:    longrunningpb.NewOperationsClient(connPool),
@@ -533,9 +529,9 @@ func (c *videoStitcherGRPCClient) Connection() *grpc.ClientConn {
 // the `x-goog-api-client` header passed on each request. Intended for
 // use by Google-written clients.
 func (c *videoStitcherGRPCClient) setGoogleClientInfo(keyval ...string) {
-	kv := append([]string{"gl-go", versionGo()}, keyval...)
+	kv := append([]string{"gl-go", gax.GoVersion}, keyval...)
 	kv = append(kv, "gapic", getVersionClient(), "gax", gax.Version, "grpc", grpc.Version)
-	c.xGoogMetadata = metadata.Pairs("x-goog-api-client", gax.XGoogHeader(kv...))
+	c.xGoogHeaders = []string{"x-goog-api-client", gax.XGoogHeader(kv...)}
 }
 
 // Close closes the connection to the API service. The user should invoke this when
@@ -545,14 +541,10 @@ func (c *videoStitcherGRPCClient) Close() error {
 }
 
 func (c *videoStitcherGRPCClient) CreateCdnKey(ctx context.Context, req *stitcherpb.CreateCdnKeyRequest, opts ...gax.CallOption) (*CreateCdnKeyOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateCdnKey[0:len((*c.CallOptions).CreateCdnKey):len((*c.CallOptions).CreateCdnKey)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -569,9 +561,10 @@ func (c *videoStitcherGRPCClient) CreateCdnKey(ctx context.Context, req *stitche
 }
 
 func (c *videoStitcherGRPCClient) ListCdnKeys(ctx context.Context, req *stitcherpb.ListCdnKeysRequest, opts ...gax.CallOption) *CdnKeyIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListCdnKeys[0:len((*c.CallOptions).ListCdnKeys):len((*c.CallOptions).ListCdnKeys)], opts...)
 	it := &CdnKeyIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListCdnKeysRequest)
@@ -614,14 +607,10 @@ func (c *videoStitcherGRPCClient) ListCdnKeys(ctx context.Context, req *stitcher
 }
 
 func (c *videoStitcherGRPCClient) GetCdnKey(ctx context.Context, req *stitcherpb.GetCdnKeyRequest, opts ...gax.CallOption) (*stitcherpb.CdnKey, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetCdnKey[0:len((*c.CallOptions).GetCdnKey):len((*c.CallOptions).GetCdnKey)], opts...)
 	var resp *stitcherpb.CdnKey
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -636,14 +625,10 @@ func (c *videoStitcherGRPCClient) GetCdnKey(ctx context.Context, req *stitcherpb
 }
 
 func (c *videoStitcherGRPCClient) DeleteCdnKey(ctx context.Context, req *stitcherpb.DeleteCdnKeyRequest, opts ...gax.CallOption) (*DeleteCdnKeyOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteCdnKey[0:len((*c.CallOptions).DeleteCdnKey):len((*c.CallOptions).DeleteCdnKey)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -660,14 +645,10 @@ func (c *videoStitcherGRPCClient) DeleteCdnKey(ctx context.Context, req *stitche
 }
 
 func (c *videoStitcherGRPCClient) UpdateCdnKey(ctx context.Context, req *stitcherpb.UpdateCdnKeyRequest, opts ...gax.CallOption) (*UpdateCdnKeyOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "cdn_key.name", url.QueryEscape(req.GetCdnKey().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "cdn_key.name", url.QueryEscape(req.GetCdnKey().GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateCdnKey[0:len((*c.CallOptions).UpdateCdnKey):len((*c.CallOptions).UpdateCdnKey)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -684,14 +665,10 @@ func (c *videoStitcherGRPCClient) UpdateCdnKey(ctx context.Context, req *stitche
 }
 
 func (c *videoStitcherGRPCClient) CreateVodSession(ctx context.Context, req *stitcherpb.CreateVodSessionRequest, opts ...gax.CallOption) (*stitcherpb.VodSession, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateVodSession[0:len((*c.CallOptions).CreateVodSession):len((*c.CallOptions).CreateVodSession)], opts...)
 	var resp *stitcherpb.VodSession
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -706,14 +683,10 @@ func (c *videoStitcherGRPCClient) CreateVodSession(ctx context.Context, req *sti
 }
 
 func (c *videoStitcherGRPCClient) GetVodSession(ctx context.Context, req *stitcherpb.GetVodSessionRequest, opts ...gax.CallOption) (*stitcherpb.VodSession, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetVodSession[0:len((*c.CallOptions).GetVodSession):len((*c.CallOptions).GetVodSession)], opts...)
 	var resp *stitcherpb.VodSession
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -728,9 +701,10 @@ func (c *videoStitcherGRPCClient) GetVodSession(ctx context.Context, req *stitch
 }
 
 func (c *videoStitcherGRPCClient) ListVodStitchDetails(ctx context.Context, req *stitcherpb.ListVodStitchDetailsRequest, opts ...gax.CallOption) *VodStitchDetailIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListVodStitchDetails[0:len((*c.CallOptions).ListVodStitchDetails):len((*c.CallOptions).ListVodStitchDetails)], opts...)
 	it := &VodStitchDetailIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListVodStitchDetailsRequest)
@@ -773,14 +747,10 @@ func (c *videoStitcherGRPCClient) ListVodStitchDetails(ctx context.Context, req 
 }
 
 func (c *videoStitcherGRPCClient) GetVodStitchDetail(ctx context.Context, req *stitcherpb.GetVodStitchDetailRequest, opts ...gax.CallOption) (*stitcherpb.VodStitchDetail, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetVodStitchDetail[0:len((*c.CallOptions).GetVodStitchDetail):len((*c.CallOptions).GetVodStitchDetail)], opts...)
 	var resp *stitcherpb.VodStitchDetail
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -795,9 +765,10 @@ func (c *videoStitcherGRPCClient) GetVodStitchDetail(ctx context.Context, req *s
 }
 
 func (c *videoStitcherGRPCClient) ListVodAdTagDetails(ctx context.Context, req *stitcherpb.ListVodAdTagDetailsRequest, opts ...gax.CallOption) *VodAdTagDetailIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListVodAdTagDetails[0:len((*c.CallOptions).ListVodAdTagDetails):len((*c.CallOptions).ListVodAdTagDetails)], opts...)
 	it := &VodAdTagDetailIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListVodAdTagDetailsRequest)
@@ -840,14 +811,10 @@ func (c *videoStitcherGRPCClient) ListVodAdTagDetails(ctx context.Context, req *
 }
 
 func (c *videoStitcherGRPCClient) GetVodAdTagDetail(ctx context.Context, req *stitcherpb.GetVodAdTagDetailRequest, opts ...gax.CallOption) (*stitcherpb.VodAdTagDetail, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetVodAdTagDetail[0:len((*c.CallOptions).GetVodAdTagDetail):len((*c.CallOptions).GetVodAdTagDetail)], opts...)
 	var resp *stitcherpb.VodAdTagDetail
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -862,9 +829,10 @@ func (c *videoStitcherGRPCClient) GetVodAdTagDetail(ctx context.Context, req *st
 }
 
 func (c *videoStitcherGRPCClient) ListLiveAdTagDetails(ctx context.Context, req *stitcherpb.ListLiveAdTagDetailsRequest, opts ...gax.CallOption) *LiveAdTagDetailIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListLiveAdTagDetails[0:len((*c.CallOptions).ListLiveAdTagDetails):len((*c.CallOptions).ListLiveAdTagDetails)], opts...)
 	it := &LiveAdTagDetailIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListLiveAdTagDetailsRequest)
@@ -907,14 +875,10 @@ func (c *videoStitcherGRPCClient) ListLiveAdTagDetails(ctx context.Context, req 
 }
 
 func (c *videoStitcherGRPCClient) GetLiveAdTagDetail(ctx context.Context, req *stitcherpb.GetLiveAdTagDetailRequest, opts ...gax.CallOption) (*stitcherpb.LiveAdTagDetail, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetLiveAdTagDetail[0:len((*c.CallOptions).GetLiveAdTagDetail):len((*c.CallOptions).GetLiveAdTagDetail)], opts...)
 	var resp *stitcherpb.LiveAdTagDetail
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -929,14 +893,10 @@ func (c *videoStitcherGRPCClient) GetLiveAdTagDetail(ctx context.Context, req *s
 }
 
 func (c *videoStitcherGRPCClient) CreateSlate(ctx context.Context, req *stitcherpb.CreateSlateRequest, opts ...gax.CallOption) (*CreateSlateOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateSlate[0:len((*c.CallOptions).CreateSlate):len((*c.CallOptions).CreateSlate)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -953,9 +913,10 @@ func (c *videoStitcherGRPCClient) CreateSlate(ctx context.Context, req *stitcher
 }
 
 func (c *videoStitcherGRPCClient) ListSlates(ctx context.Context, req *stitcherpb.ListSlatesRequest, opts ...gax.CallOption) *SlateIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListSlates[0:len((*c.CallOptions).ListSlates):len((*c.CallOptions).ListSlates)], opts...)
 	it := &SlateIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListSlatesRequest)
@@ -998,14 +959,10 @@ func (c *videoStitcherGRPCClient) ListSlates(ctx context.Context, req *stitcherp
 }
 
 func (c *videoStitcherGRPCClient) GetSlate(ctx context.Context, req *stitcherpb.GetSlateRequest, opts ...gax.CallOption) (*stitcherpb.Slate, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetSlate[0:len((*c.CallOptions).GetSlate):len((*c.CallOptions).GetSlate)], opts...)
 	var resp *stitcherpb.Slate
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1020,14 +977,10 @@ func (c *videoStitcherGRPCClient) GetSlate(ctx context.Context, req *stitcherpb.
 }
 
 func (c *videoStitcherGRPCClient) UpdateSlate(ctx context.Context, req *stitcherpb.UpdateSlateRequest, opts ...gax.CallOption) (*UpdateSlateOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "slate.name", url.QueryEscape(req.GetSlate().GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "slate.name", url.QueryEscape(req.GetSlate().GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).UpdateSlate[0:len((*c.CallOptions).UpdateSlate):len((*c.CallOptions).UpdateSlate)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1044,14 +997,10 @@ func (c *videoStitcherGRPCClient) UpdateSlate(ctx context.Context, req *stitcher
 }
 
 func (c *videoStitcherGRPCClient) DeleteSlate(ctx context.Context, req *stitcherpb.DeleteSlateRequest, opts ...gax.CallOption) (*DeleteSlateOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteSlate[0:len((*c.CallOptions).DeleteSlate):len((*c.CallOptions).DeleteSlate)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1068,14 +1017,10 @@ func (c *videoStitcherGRPCClient) DeleteSlate(ctx context.Context, req *stitcher
 }
 
 func (c *videoStitcherGRPCClient) CreateLiveSession(ctx context.Context, req *stitcherpb.CreateLiveSessionRequest, opts ...gax.CallOption) (*stitcherpb.LiveSession, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateLiveSession[0:len((*c.CallOptions).CreateLiveSession):len((*c.CallOptions).CreateLiveSession)], opts...)
 	var resp *stitcherpb.LiveSession
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1090,14 +1035,10 @@ func (c *videoStitcherGRPCClient) CreateLiveSession(ctx context.Context, req *st
 }
 
 func (c *videoStitcherGRPCClient) GetLiveSession(ctx context.Context, req *stitcherpb.GetLiveSessionRequest, opts ...gax.CallOption) (*stitcherpb.LiveSession, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetLiveSession[0:len((*c.CallOptions).GetLiveSession):len((*c.CallOptions).GetLiveSession)], opts...)
 	var resp *stitcherpb.LiveSession
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1112,14 +1053,10 @@ func (c *videoStitcherGRPCClient) GetLiveSession(ctx context.Context, req *stitc
 }
 
 func (c *videoStitcherGRPCClient) CreateLiveConfig(ctx context.Context, req *stitcherpb.CreateLiveConfigRequest, opts ...gax.CallOption) (*CreateLiveConfigOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CreateLiveConfig[0:len((*c.CallOptions).CreateLiveConfig):len((*c.CallOptions).CreateLiveConfig)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1136,9 +1073,10 @@ func (c *videoStitcherGRPCClient) CreateLiveConfig(ctx context.Context, req *sti
 }
 
 func (c *videoStitcherGRPCClient) ListLiveConfigs(ctx context.Context, req *stitcherpb.ListLiveConfigsRequest, opts ...gax.CallOption) *LiveConfigIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "parent", url.QueryEscape(req.GetParent()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListLiveConfigs[0:len((*c.CallOptions).ListLiveConfigs):len((*c.CallOptions).ListLiveConfigs)], opts...)
 	it := &LiveConfigIterator{}
 	req = proto.Clone(req).(*stitcherpb.ListLiveConfigsRequest)
@@ -1181,14 +1119,10 @@ func (c *videoStitcherGRPCClient) ListLiveConfigs(ctx context.Context, req *stit
 }
 
 func (c *videoStitcherGRPCClient) GetLiveConfig(ctx context.Context, req *stitcherpb.GetLiveConfigRequest, opts ...gax.CallOption) (*stitcherpb.LiveConfig, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetLiveConfig[0:len((*c.CallOptions).GetLiveConfig):len((*c.CallOptions).GetLiveConfig)], opts...)
 	var resp *stitcherpb.LiveConfig
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1203,14 +1137,10 @@ func (c *videoStitcherGRPCClient) GetLiveConfig(ctx context.Context, req *stitch
 }
 
 func (c *videoStitcherGRPCClient) DeleteLiveConfig(ctx context.Context, req *stitcherpb.DeleteLiveConfigRequest, opts ...gax.CallOption) (*DeleteLiveConfigOperation, error) {
-	if _, ok := ctx.Deadline(); !ok && !c.disableDeadlines {
-		cctx, cancel := context.WithTimeout(ctx, 60000*time.Millisecond)
-		defer cancel()
-		ctx = cctx
-	}
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteLiveConfig[0:len((*c.CallOptions).DeleteLiveConfig):len((*c.CallOptions).DeleteLiveConfig)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1227,9 +1157,10 @@ func (c *videoStitcherGRPCClient) DeleteLiveConfig(ctx context.Context, req *sti
 }
 
 func (c *videoStitcherGRPCClient) CancelOperation(ctx context.Context, req *longrunningpb.CancelOperationRequest, opts ...gax.CallOption) error {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).CancelOperation[0:len((*c.CallOptions).CancelOperation):len((*c.CallOptions).CancelOperation)], opts...)
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		var err error
@@ -1240,9 +1171,10 @@ func (c *videoStitcherGRPCClient) CancelOperation(ctx context.Context, req *long
 }
 
 func (c *videoStitcherGRPCClient) DeleteOperation(ctx context.Context, req *longrunningpb.DeleteOperationRequest, opts ...gax.CallOption) error {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).DeleteOperation[0:len((*c.CallOptions).DeleteOperation):len((*c.CallOptions).DeleteOperation)], opts...)
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
 		var err error
@@ -1253,9 +1185,10 @@ func (c *videoStitcherGRPCClient) DeleteOperation(ctx context.Context, req *long
 }
 
 func (c *videoStitcherGRPCClient) GetOperation(ctx context.Context, req *longrunningpb.GetOperationRequest, opts ...gax.CallOption) (*longrunningpb.Operation, error) {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).GetOperation[0:len((*c.CallOptions).GetOperation):len((*c.CallOptions).GetOperation)], opts...)
 	var resp *longrunningpb.Operation
 	err := gax.Invoke(ctx, func(ctx context.Context, settings gax.CallSettings) error {
@@ -1270,9 +1203,10 @@ func (c *videoStitcherGRPCClient) GetOperation(ctx context.Context, req *longrun
 }
 
 func (c *videoStitcherGRPCClient) ListOperations(ctx context.Context, req *longrunningpb.ListOperationsRequest, opts ...gax.CallOption) *OperationIterator {
-	md := metadata.Pairs("x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName())))
+	hds := []string{"x-goog-request-params", fmt.Sprintf("%s=%v", "name", url.QueryEscape(req.GetName()))}
 
-	ctx = insertMetadata(ctx, c.xGoogMetadata, md)
+	hds = append(c.xGoogHeaders, hds...)
+	ctx = gax.InsertMetadataIntoOutgoingContext(ctx, hds...)
 	opts = append((*c.CallOptions).ListOperations[0:len((*c.CallOptions).ListOperations):len((*c.CallOptions).ListOperations)], opts...)
 	it := &OperationIterator{}
 	req = proto.Clone(req).(*longrunningpb.ListOperationsRequest)
