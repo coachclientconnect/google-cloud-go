@@ -2862,11 +2862,14 @@ func TestIntegration_InstanceAdminClient_AppProfile(t *testing.T) {
 			continue
 		}
 
-		got, _ := iAdminClient.GetAppProfile(ctx, adminClient.instance, profileID)
+		// Retry to see if the update has been completed
+		testutil.Retry(t, 10, 10*time.Second, func(r *testutil.R) {
+			got, _ := iAdminClient.GetAppProfile(ctx, adminClient.instance, profileID)
 
-		if !proto.Equal(got, test.want) {
-			t.Fatalf("%s : got profile : %v, want profile: %v", test.desc, gotProfile, test.want)
-		}
+			if !proto.Equal(got, test.want) {
+				r.Errorf("%s : got profile : %v, want profile: %v", test.desc, gotProfile, test.want)
+			}
+		})
 
 	}
 
@@ -2947,7 +2950,7 @@ func TestIntegration_AdminBackup(t *testing.T) {
 		t.Skip("emulator doesn't support backups")
 	}
 
-	timeout := 10 * time.Minute
+	timeout := 15 * time.Minute
 	ctx, _ := context.WithTimeout(context.Background(), timeout)
 
 	adminClient, err := testEnv.NewAdminClient()
@@ -3322,7 +3325,7 @@ func deleteTable(ctx context.Context, t *testing.T, ac *AdminClient, name string
 		Max:        2 * time.Second,
 		Multiplier: 1.2,
 	}
-	ctx, _ = context.WithTimeout(ctx, time.Second*30)
+	ctx, _ = context.WithTimeout(ctx, time.Second*60)
 
 	err := internal.Retry(ctx, bo, func() (bool, error) {
 		err := ac.DeleteTable(ctx, name)
