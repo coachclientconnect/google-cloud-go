@@ -20,10 +20,10 @@ import (
 	"time"
 
 	pb "cloud.google.com/go/firestore/apiv1/firestorepb"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -59,10 +59,10 @@ func TestRunTransaction(t *testing.T) {
 		&pb.BatchGetDocumentsRequest{
 			Database:            c.path(),
 			Documents:           []string{db + "/documents/C/a"},
-			ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{tid},
+			ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{Transaction: tid},
 		}, []interface{}{
 			&pb.BatchGetDocumentsResponse{
-				Result:   &pb.BatchGetDocumentsResponse_Found{aDoc},
+				Result:   &pb.BatchGetDocumentsResponse_Found{Found: aDoc},
 				ReadTime: aTimestamp2,
 			},
 		})
@@ -75,10 +75,10 @@ func TestRunTransaction(t *testing.T) {
 			Database:    db,
 			Transaction: tid,
 			Writes: []*pb.Write{{
-				Operation:  &pb.Write_Update{aDoc2},
+				Operation:  &pb.Write_Update{Update: aDoc2},
 				UpdateMask: &pb.DocumentMask{FieldPaths: []string{"count"}},
 				CurrentDocument: &pb.Precondition{
-					ConditionType: &pb.Precondition_Exists{true},
+					ConditionType: &pb.Precondition_Exists{Exists: true},
 				},
 			}},
 		},
@@ -113,11 +113,11 @@ func TestRunTransaction(t *testing.T) {
 		&pb.RunQueryRequest{
 			Parent: db + "/documents",
 			QueryType: &pb.RunQueryRequest_StructuredQuery{
-				&pb.StructuredQuery{
+				StructuredQuery: &pb.StructuredQuery{
 					From: []*pb.StructuredQuery_CollectionSelector{{CollectionId: "C"}},
 				},
 			},
-			ConsistencySelector: &pb.RunQueryRequest_Transaction{tid},
+			ConsistencySelector: &pb.RunQueryRequest_Transaction{Transaction: tid},
 		},
 		[]interface{}{},
 	)
@@ -144,7 +144,7 @@ func TestRunTransaction(t *testing.T) {
 			Database: db,
 			Options: &pb.TransactionOptions{
 				Mode: &pb.TransactionOptions_ReadWrite_{
-					&pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
+					ReadWrite: &pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
 				},
 			},
 		},
@@ -173,7 +173,7 @@ func TestTransactionErrors(t *testing.T) {
 		getReq   = &pb.BatchGetDocumentsRequest{
 			Database:            c.path(),
 			Documents:           []string{db + "/documents/C/a"},
-			ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{tid},
+			ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{Transaction: tid},
 		}
 		rollbackReq = &pb.RollbackRequest{Database: db, Transaction: tid}
 		commitReq   = &pb.CommitRequest{Database: db, Transaction: tid}
@@ -194,7 +194,7 @@ func TestTransactionErrors(t *testing.T) {
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
 	srv.addRPC(getReq, unknownErr)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, get)
 	if status.Code(err) != codes.Unknown {
 		t.Errorf("got <%v>, want Unknown", err)
@@ -216,7 +216,7 @@ func TestTransactionErrors(t *testing.T) {
 	srv.addRPC(beginReq, beginRes)
 	srv.addRPC(getReq, []interface{}{
 		&pb.BatchGetDocumentsResponse{
-			Result: &pb.BatchGetDocumentsResponse_Found{&pb.Document{
+			Result: &pb.BatchGetDocumentsResponse_Found{Found: &pb.Document{
 				Name:       "projects/projectID/databases/(default)/documents/C/a",
 				CreateTime: aTimestamp,
 				UpdateTime: aTimestamp2,
@@ -233,7 +233,7 @@ func TestTransactionErrors(t *testing.T) {
 	// Read after write.
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(_ context.Context, tx *Transaction) error {
 		if err := tx.Delete(c.Doc("C/a")); err != nil {
 			return err
@@ -250,7 +250,7 @@ func TestTransactionErrors(t *testing.T) {
 	// Read after write, with query.
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(_ context.Context, tx *Transaction) error {
 		if err := tx.Delete(c.Doc("C/a")); err != nil {
 			return err
@@ -269,7 +269,7 @@ func TestTransactionErrors(t *testing.T) {
 	// Read after write, with query and GetAll.
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(_ context.Context, tx *Transaction) error {
 		if err := tx.Delete(c.Doc("C/a")); err != nil {
 			return err
@@ -284,7 +284,7 @@ func TestTransactionErrors(t *testing.T) {
 	// Read after write fails even if the user ignores the read's error.
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(_ context.Context, tx *Transaction) error {
 		if err := tx.Delete(c.Doc("C/a")); err != nil {
 			return err
@@ -304,12 +304,12 @@ func TestTransactionErrors(t *testing.T) {
 		&pb.BeginTransactionRequest{
 			Database: db,
 			Options: &pb.TransactionOptions{
-				Mode: &pb.TransactionOptions_ReadOnly_{&pb.TransactionOptions_ReadOnly{}},
+				Mode: &pb.TransactionOptions_ReadOnly_{ReadOnly: &pb.TransactionOptions_ReadOnly{}},
 			},
 		},
 		beginRes,
 	)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(_ context.Context, tx *Transaction) error {
 		return tx.Delete(c.Doc("C/a"))
 	}, ReadOnly)
@@ -326,14 +326,14 @@ func TestTransactionErrors(t *testing.T) {
 			Database: db,
 			Options: &pb.TransactionOptions{
 				Mode: &pb.TransactionOptions_ReadWrite_{
-					&pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
+					ReadWrite: &pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
 				},
 			},
 		},
 		beginRes,
 	)
 	srv.addRPC(commitReq, status.Errorf(codes.Aborted, ""))
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(context.Context, *Transaction) error { return nil },
 		MaxAttempts(2))
 	if status.Code(err) != codes.Aborted {
@@ -343,7 +343,7 @@ func TestTransactionErrors(t *testing.T) {
 	// Nested transaction.
 	srv.reset()
 	srv.addRPC(beginReq, beginRes)
-	srv.addRPC(rollbackReq, &empty.Empty{})
+	srv.addRPC(rollbackReq, &emptypb.Empty{})
 	err = c.RunTransaction(ctx, func(ctx context.Context, tx *Transaction) error {
 		return c.RunTransaction(ctx, func(context.Context, *Transaction) error { return nil })
 	})
@@ -368,7 +368,7 @@ func TestTransactionGetAll(t *testing.T) {
 			dbPath + "/documents/C/b",
 			dbPath + "/documents/C/c",
 		},
-		ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{tid},
+		ConsistencySelector: &pb.BatchGetDocumentsRequest_Transaction{Transaction: tid},
 	}
 	err := c.RunTransaction(context.Background(), func(_ context.Context, tx *Transaction) error {
 		testGetAll(t, c, srv, dbPath,
@@ -413,10 +413,10 @@ func TestRunTransaction_Retries(t *testing.T) {
 			Database:    db,
 			Transaction: tid,
 			Writes: []*pb.Write{{
-				Operation:  &pb.Write_Update{aDoc2},
+				Operation:  &pb.Write_Update{Update: aDoc2},
 				UpdateMask: &pb.DocumentMask{FieldPaths: []string{"count"}},
 				CurrentDocument: &pb.Precondition{
-					ConditionType: &pb.Precondition_Exists{true},
+					ConditionType: &pb.Precondition_Exists{Exists: true},
 				},
 			}},
 		},
@@ -428,7 +428,7 @@ func TestRunTransaction_Retries(t *testing.T) {
 			Database: db,
 			Options: &pb.TransactionOptions{
 				Mode: &pb.TransactionOptions_ReadWrite_{
-					&pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
+					ReadWrite: &pb.TransactionOptions_ReadWrite{RetryTransaction: tid},
 				},
 			},
 		},
@@ -440,10 +440,10 @@ func TestRunTransaction_Retries(t *testing.T) {
 			Database:    db,
 			Transaction: tid,
 			Writes: []*pb.Write{{
-				Operation:  &pb.Write_Update{aDoc2},
+				Operation:  &pb.Write_Update{Update: aDoc2},
 				UpdateMask: &pb.DocumentMask{FieldPaths: []string{"count"}},
 				CurrentDocument: &pb.Precondition{
-					ConditionType: &pb.Precondition_Exists{true},
+					ConditionType: &pb.Precondition_Exists{Exists: true},
 				},
 			}},
 		},
@@ -486,7 +486,7 @@ func TestRunTransaction_NonTransactionalOp(t *testing.T) {
 			Documents: []string{db + "/documents/C/a"},
 		}, []interface{}{
 			&pb.BatchGetDocumentsResponse{
-				Result:   &pb.BatchGetDocumentsResponse_Found{aDoc},
+				Result:   &pb.BatchGetDocumentsResponse_Found{Found: aDoc},
 				ReadTime: aTimestamp2,
 			},
 		})

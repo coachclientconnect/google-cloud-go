@@ -73,11 +73,12 @@ func TestRetryApply(t *testing.T) {
 
 	errCount := 0
 	code := codes.Unavailable // Will be retried
+	errMsg := ""
 	// Intercept requests and return an error or defer to the underlying handler
 	errInjector := func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		if strings.HasSuffix(info.FullMethod, "MutateRow") && errCount < 3 {
 			errCount++
-			return nil, status.Errorf(code, "")
+			return nil, status.Errorf(code, errMsg)
 		}
 		return handler(ctx, req)
 	}
@@ -127,6 +128,29 @@ func TestRetryApply(t *testing.T) {
 	}
 
 	errCount = 0
+	code = codes.Internal // Will be retried
+	errMsg = "stream terminated by RST_STREAM"
+	if err := tbl.Apply(ctx, "row", mut); err != nil {
+		t.Errorf("applying single mutation with retries: %v", err)
+	}
+	row, err = tbl.ReadRow(ctx, "row")
+	if err != nil {
+		t.Errorf("reading single value with retries: %v", err)
+	}
+	if row == nil {
+		t.Errorf("applying single mutation with retries: could not read back row")
+	}
+
+	errCount = 0
+	errMsg = ""
+	code = codes.Internal // Won't be retried
+	errMsg = "Placeholder message"
+	if err := tbl.Apply(ctx, "row", condMut); err == nil {
+		t.Errorf("conditionally mutating row with no retries: no error")
+	}
+
+	errCount = 0
+	errMsg = ""
 	code = codes.FailedPrecondition // Won't be retried
 	if err := tbl.Apply(ctx, "row", condMut); err == nil {
 		t.Errorf("conditionally mutating row with no retries: no error")
@@ -345,7 +369,7 @@ func writeMutateRowsResponse(ss grpc.ServerStream, codes ...codes.Code) error {
 func TestRetainRowsAfter(t *testing.T) {
 	prevRowRange := NewRange("a", "z")
 	prevRowKey := "m"
-	want := NewRange("m\x00", "z")
+	want := NewOpenRange("m", "z")
 	got := prevRowRange.retainRowsAfter(prevRowKey)
 	if !testutil.Equal(want, got, cmp.AllowUnexported(RowRange{})) {
 		t.Errorf("range retry: got %v, want %v", got, want)
@@ -353,7 +377,7 @@ func TestRetainRowsAfter(t *testing.T) {
 
 	prevRowRangeList := RowRangeList{NewRange("a", "d"), NewRange("e", "g"), NewRange("h", "l")}
 	prevRowKey = "f"
-	wantRowRangeList := RowRangeList{NewRange("f\x00", "g"), NewRange("h", "l")}
+	wantRowRangeList := RowRangeList{NewOpenRange("f", "g"), NewRange("h", "l")}
 	got = prevRowRangeList.retainRowsAfter(prevRowKey)
 	if !testutil.Equal(wantRowRangeList, got, cmp.AllowUnexported(RowRange{})) {
 		t.Errorf("range list retry: got %v, want %v", got, wantRowRangeList)
@@ -406,7 +430,7 @@ func TestRetryReadRows(t *testing.T) {
 			err = status.Errorf(codes.Unavailable, "")
 		case 2:
 			// Retryable request failure
-			if want, got := "b\x00", string(req.Rows.RowRanges[0].GetStartKeyClosed()); want != got {
+			if want, got := "b", string(req.Rows.RowRanges[0].GetStartKeyOpen()); want != got {
 				t.Errorf("2 range retries: got %q, want %q", got, want)
 			}
 			err = status.Errorf(codes.Unavailable, "")
@@ -418,7 +442,7 @@ func TestRetryReadRows(t *testing.T) {
 			must(ss.SendMsg(&btpb.ReadRowsResponse{LastScannedRowKey: []byte("e")}))
 			err = status.Errorf(codes.Unavailable, "")
 		case 5:
-			if want, got := "e\x00", string(req.Rows.RowRanges[0].GetStartKeyClosed()); want != got {
+			if want, got := "e", string(req.Rows.RowRanges[0].GetStartKeyOpen()); want != got {
 				t.Errorf("3 range retries: got %q, want %q", got, want)
 			}
 			must(writeReadRowsResponse(ss, "f", "g"))
@@ -434,6 +458,80 @@ func TestRetryReadRows(t *testing.T) {
 		return true
 	}))
 	want := []string{"a", "b", "c", "d", "f", "g"}
+	if !testutil.Equal(got, want) {
+		t.Errorf("retry range integration: got %v, want %v", got, want)
+	}
+}
+
+func TestRetryReverseReadRows(t *testing.T) {
+	ctx := context.Background()
+
+	// Intercept requests and delegate to an interceptor defined by the test case
+	errCount := 0
+	var f func(grpc.ServerStream) error
+	errInjector := func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+		if strings.HasSuffix(info.FullMethod, "ReadRows") {
+			return f(ss)
+		}
+		return handler(ctx, ss)
+	}
+
+	tbl, cleanup, err := setupFakeServer(grpc.StreamInterceptor(errInjector))
+	defer cleanup()
+	if err != nil {
+		t.Fatalf("fake server setup: %v", err)
+	}
+
+	errCount = 0
+	// Test overall request failure and retries
+	f = func(ss grpc.ServerStream) error {
+		var err error
+		req := new(btpb.ReadRowsRequest)
+		must(ss.RecvMsg(req))
+		switch errCount {
+		case 0:
+			// Retryable request failure
+			err = status.Errorf(codes.Unavailable, "")
+		case 1:
+			// Write two rows then error
+			if want, got := "z", string(req.Rows.RowRanges[0].GetEndKeyClosed()); want != got {
+				t.Errorf("first retry, no data received yet: got %q, want %q", got, want)
+			}
+			must(writeReadRowsResponse(ss, "g", "f"))
+			err = status.Errorf(codes.Unavailable, "")
+		case 2:
+			// Retryable request failure
+			if want, got := "f", string(req.Rows.RowRanges[0].GetEndKeyOpen()); want != got {
+				t.Errorf("2 range retries: got %q, want %q", got, want)
+			}
+			err = status.Errorf(codes.Unavailable, "")
+		case 3:
+			must(ss.SendMsg(&btpb.ReadRowsResponse{LastScannedRowKey: []byte("e")}))
+			err = status.Errorf(codes.Unavailable, "")
+		case 4:
+			if want, got := "e", string(req.Rows.RowRanges[0].GetEndKeyOpen()); want != got {
+				t.Errorf("3 range retries: got %q, want %q", got, want)
+			}
+			// Write two more rows
+			must(writeReadRowsResponse(ss, "d", "c"))
+			err = status.Errorf(codes.Unavailable, "")
+		case 5:
+			if want, got := "c", string(req.Rows.RowRanges[0].GetEndKeyOpen()); want != got {
+				t.Errorf("3 range retries: got %q, want %q", got, want)
+			}
+			must(writeReadRowsResponse(ss, "b", "a"))
+			err = nil
+		}
+		errCount++
+		return err
+	}
+
+	var got []string
+	must(tbl.ReadRows(ctx, NewClosedRange("a", "z"), func(r Row) bool {
+		got = append(got, r.Key())
+		return true
+	}, ReverseScan()))
+	want := []string{"g", "f", "d", "c", "b", "a"}
 	if !testutil.Equal(got, want) {
 		t.Errorf("retry range integration: got %v, want %v", got, want)
 	}
